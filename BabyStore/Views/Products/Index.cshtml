@@ -1,0 +1,82 @@
+﻿@model BabyStore.ViewModels.ProductIndexViewModel
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "Index";
+}
+<br><br><br>
+<p>
+    @(String.IsNullOrWhiteSpace(Model.Search) ? "Showing all" : "You search for " + Model.Search + " found")
+    @Model.Products.TotalItemCount products
+</p>
+<br><br>
+<div class="container">
+    @using (Html.BeginForm("Index", "Products", FormMethod.Get, new { @class = "form-horizontal" }))
+    {
+        <label class="control-label">Filter by category:</label>
+                    @Html.DropDownListFor(vm => vm.Category, Model.CatFilterItems, "All", new { @class = "dropdown" })
+        ;
+        <label class="control-label">Sort by:</label>
+                    @Html.DropDownListFor(vm => vm.SortBy, new SelectList(Model.Sorts, "Value", "Key"), "Default", new { @class = "dropdown" })
+                    <button type="submit" class="btn btn-xs btn-success">
+                        <i class="glyphicon glyphicon-filter"></i>
+                    </button>
+                    <input type="hidden" name="Search" id="Search" value="@ViewBag.Search" />
+    }
+</div>
+<br>
+<table class="table table-hover table-responsive">
+    <tr>
+        <th>
+            <button class="btn btn-primary btn-sm" disabled="disabled">Category</button>
+        </th>
+        <th>
+            <button class="btn btn-primary btn-sm" disabled="disabled">Product Name</button>
+        </th>
+        <th>
+            <button class="btn btn-primary btn-sm text-center" disabled="disabled">Description</button>
+        </th>
+        <th>
+            <button class="btn btn-primary btn-sm" disabled="disabled">Price</button>
+        </th>
+        <th>
+            <a href="@Url.Action("Create", "Products")" data-toggle="tooltip" title="Create">
+                <span class="fa fa-2x fa-plus-circle text-success"></span>
+            </a>
+        </th>
+    </tr>
+
+    @foreach (var item in Model.Products)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                <a href="@Url.Action("Edit", "Products", new {id = item.ID})" data-toggle="tooltip" title="Edit">
+                    <span class="glyphicon glyphicon-edit"></span>
+                </a>
+                <a href="@Url.Action("Details", "Products", new {id = item.ID})" data-toggle="tooltip" title="Details">
+                    <span class="glyphicon glyphicon-list-alt text-warning"></span>
+                </a>
+                <a href="@Url.Action("Delete", "Products", new {id = item.ID})" data-toggle="tooltip" title="Delete">
+                    <span class="glyphicon glyphicon-trash text-danger"></span>
+                </a>
+            </td>
+        </tr>
+    }
+
+</table>
+<div>
+    Page @(Model.Products.PageCount < Model.Products.PageNumber ? 0 : Model.Products.PageNumber) of @Model.Products.PageCount
+    @Html.PagedListPager(Model.Products, page => Url.Action("Index", new { category = @Model.Category, Search = @Model.Search, sortBy = @Model.SortBy, page }))
+</div>
